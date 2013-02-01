@@ -1,21 +1,26 @@
 var express = require('express'),
     app = express(),
+    mongoose = require('mongoose'),
     general = require('./lib/general'),
     users = require('./lib/users'),
     slides = require('./lib/slides'),
     locations = require('./lib/locations'),
     organizations = require('./lib/organizations');
 
+mongoose.set('debug', true);
+
+mongoose.connect("mongodb://ten:123@linus.mongohq.com:10016/ten-api");
+mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
+mongoose.connection.once('open', function callback () {
+  console.log("Mongoose Connection Open");
+});
 
 app.configure(function () {
   app.set('port', 3001);
   app.use(express.logger('dev'));
-  // app.use(express.bodyParser());
-  // app.use(express.methodOverride());
+  app.use(express.bodyParser());
+  app.use(express.methodOverride());
   app.use(app.router);
-});
-
-app.configure('development', function () {
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
 });
 
@@ -49,9 +54,9 @@ app.delete('/locations/:organization/:location', locations.delete);
 // Organizations
 app.get('/organizations', organizations.list);
 app.post('/organizations', organizations.create);
-app.get('/organizations/:organization', organizations.get);
-app.put('/organizations/:organization', organizations.update);
-app.delete('/organizations/:organization', organizations.delete);
+app.get('/organizations/:id', organizations.get);
+app.put('/organizations/:id', organizations.update);
+app.delete('/organizations/:id', organizations.delete);
 
 
 app.listen(app.get('port'));

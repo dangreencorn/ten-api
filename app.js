@@ -2,13 +2,13 @@ var express = require('express'),
     app = express(),
     mongoose = require('mongoose'),
     general = require('./lib/general'),
+    authentication = require('./lib/authentication'),
     users = require('./lib/users'),
     slides = require('./lib/slides'),
     locations = require('./lib/locations'),
     organizations = require('./lib/organizations');
 
 mongoose.set('debug', true);
-
 mongoose.connect("mongodb://ten:123@linus.mongohq.com:10016/ten-api");
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 mongoose.connection.once('open', function callback () {
@@ -16,12 +16,20 @@ mongoose.connection.once('open', function callback () {
 });
 
 app.configure(function () {
+  app.disable('x-powered-by');
   app.set('port', 3001);
   app.use(express.logger('dev'));
+  app.use(express.compress());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
+  // authenticate before routes middleware
+  app.use(authentication.authenticate);
+  // routes
   app.use(app.router);
+  // catch exceptions
   app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  app.use(general.notfound);
+  app.use(general.catchError);
 });
 
 // General

@@ -34,8 +34,8 @@ app.get('/routes', function (req, res) {
 // Users
 app.get('/users', users.list);
 app.post('/users', users.create);
-app.get('/users/:id', users.get);
-app.put('/users/:id', users.update);
+app.get('/users/:username', users.get);
+app.put('/users/:username', users.update);
 
 // Slides
 app.get('/slides/:organization/slides', slides.list);
@@ -54,9 +54,9 @@ app.delete('/locations/:organization/:location', locations.delete);
 // Organizations
 app.get('/organizations', organizations.list);
 app.post('/organizations', organizations.create);
-app.get('/organizations/:id', organizations.get);
-app.put('/organizations/:id', organizations.update);
-app.delete('/organizations/:id', organizations.delete);
+app.get('/organizations/:organization', organizations.get);
+app.put('/organizations/:organization', organizations.update);
+app.delete('/organizations/:organization', organizations.delete);
 
 
 app.listen(app.get('port'));

@@ -22,8 +22,6 @@ app.configure(function () {
   app.use(express.compress());
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  // authenticate before routes middleware
-  app.use(authentication.authenticate);
   // routes
   app.use(app.router);
   // catch exceptions
@@ -31,6 +29,14 @@ app.configure(function () {
   app.use(general.notfound);
   app.use(general.catchError);
 });
+
+app.configure('development', function(){
+  app.set('master api key', 'http://localhost:3001/');
+})
+
+app.configure('production', function(){
+  app.set('api server', 'https://ten-api.jit.su/');
+})
 
 // General
 app.get('/', general.ping);
@@ -40,31 +46,31 @@ app.get('/routes', function (req, res) {
 });
 
 // Users
-app.get('/users', users.list);
+app.get('/users', authentication.authenticate, users.list);
 app.post('/users', users.create);
-app.get('/users/:username', users.get);
-app.put('/users/:username', users.update);
+app.get('/users/:username', authentication.authenticate, users.get);
+app.put('/users/:username', authentication.authenticate, users.update);
 
 // Slides
-app.get('/slides/:organization/slides', slides.list);
-app.post('/slides/:organization/slides', slides.create);
-app.get('/slides/:organization/slides/:id', slides.get);
-app.put('/slides/:organization/slides/:id', slides.update);
-app.delete('/slides/:organization/slides/:id', slides.delete);
+app.get('/slides/:organization/slides', authentication.authenticate, slides.list);
+app.post('/slides/:organization/slides', authentication.authenticate, slides.create);
+app.get('/slides/:organization/slides/:id', authentication.authenticate, slides.get);
+app.put('/slides/:organization/slides/:id', authentication.authenticate, slides.update);
+app.delete('/slides/:organization/slides/:id', authentication.authenticate, slides.delete);
 
 // Locations
-app.get('/locations', locations.list);
-app.post('/locations', locations.create);
-app.get('/locations/:organization/:location', locations.get);
-app.put('/locations/:organization/:location', locations.update);
-app.delete('/locations/:organization/:location', locations.delete);
+app.get('/locations/:organization', authentication.authenticate, locations.list);
+app.post('/locations/:organization', authentication.authenticate, locations.create);
+app.get('/locations/:organization/:location', authentication.authenticate, locations.get);
+app.put('/locations/:organization/:location', authentication.authenticate, locations.update);
+app.delete('/locations/:organization/:location', authentication.authenticate, locations.delete);
 
 // Organizations
-app.get('/organizations', organizations.list);
-app.post('/organizations', organizations.create);
-app.get('/organizations/:organization', organizations.get);
-app.put('/organizations/:organization', organizations.update);
-app.delete('/organizations/:organization', organizations.delete);
+app.get('/organizations', authentication.authenticate, organizations.list);
+app.post('/organizations', authentication.authenticate, organizations.create);
+app.get('/organizations/:organization', authentication.authenticate, organizations.get);
+app.put('/organizations/:organization', authentication.authenticate, organizations.update);
+app.delete('/organizations/:organization', authentication.authenticate, organizations.delete);
 
 
 app.listen(app.get('port'));
